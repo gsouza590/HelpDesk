@@ -9,9 +9,11 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -33,19 +35,31 @@ public class TecnicoController {
 		Tecnico tec = tecService.findById(id);
 		return ResponseEntity.ok(new TecnicoDto(tec));
 	}
-	
+
 	@GetMapping
-	public ResponseEntity <List<TecnicoDto>> findAll(){
+	public ResponseEntity<List<TecnicoDto>> findAll() {
 		List<Tecnico> list = tecService.findAll();
-		List<TecnicoDto>listDto = list.stream().map(x-> new TecnicoDto(x)).collect(Collectors.toList());
+		List<TecnicoDto> listDto = list.stream().map(x -> new TecnicoDto(x)).collect(Collectors.toList());
 		return ResponseEntity.ok().body(listDto);
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<TecnicoDto> create(@Valid @RequestBody TecnicoDto dto){
+	public ResponseEntity<TecnicoDto> create(@Valid @RequestBody TecnicoDto dto) {
 		Tecnico newDto = tecService.create(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(newDto.getId()).toUri();
 		return ResponseEntity.created(uri).build();
-		
+
+	}
+
+	@PutMapping(value = "/{id}")
+	public ResponseEntity<TecnicoDto> update(@PathVariable Integer id, @Valid @RequestBody TecnicoDto dto) {
+		Tecnico tec = tecService.update(id, dto);
+		return ResponseEntity.ok().body(new TecnicoDto(tec));
+	}
+
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity<TecnicoDto> delete(@PathVariable Integer id) {
+		tecService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 }

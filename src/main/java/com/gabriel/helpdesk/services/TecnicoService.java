@@ -3,6 +3,8 @@ package com.gabriel.helpdesk.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +49,21 @@ public class TecnicoService {
 		if (obj.isPresent() && obj.get().getId() != dto.getId()) {
 			throw new DataIntegrityViolationException("E-mail já cadastrado no sistema!");
 		}
+	}
+
+	public Tecnico update(Integer id, @Valid TecnicoDto dto) {
+		dto.setId(id);
+		Tecnico tec = findById(id);
+		validaCpfeEmail(dto);
+		tec = new Tecnico(dto);
+		return repository.save(tec);
+	}
+
+	public void delete(Integer id) {
+		Tecnico tec = findById(id);
+		if (tec.getChamados().size() > 0) {
+			throw new DataIntegrityViolationException("Tecnico possui ordens de serviço e não pode ser deletado");
+		}
+		repository.deleteById(id);
 	}
 }
