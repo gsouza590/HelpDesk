@@ -6,29 +6,40 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gabriel.helpdesk.model.Tecnico;
 import com.gabriel.helpdesk.model.enums.Perfil;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class TecnicoDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	protected Integer id;
+	@NotNull(message = "O campo deve ser preenchido ")
 	protected String nome;
+	@NotNull(message = "O campo deve ser preenchido ")
+
 	protected String cpf;
+	@NotNull(message = "O campo deve ser preenchido ")
+
 	protected String email;
+	@NotNull(message = "O campo deve ser preenchido ")
 	protected String senha;
 	protected Set<Integer> perfis = new HashSet<>();
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	protected LocalDate dataCriacao = LocalDate.now();
+
+	public TecnicoDto() {
+		super();
+		addPerfil(Perfil.CLIENTE);
+	}
 
 	public TecnicoDto(Tecnico tec) {
 		super();
@@ -39,6 +50,7 @@ public class TecnicoDto implements Serializable {
 		this.senha = tec.getSenha();
 		this.perfis = tec.getPerfis().stream().map(x -> x.getCodigo()).collect(Collectors.toSet());
 		this.dataCriacao = tec.getDataCriacao();
+		addPerfil(Perfil.CLIENTE);
 	}
 
 	public Set<Perfil> getPerfis() {

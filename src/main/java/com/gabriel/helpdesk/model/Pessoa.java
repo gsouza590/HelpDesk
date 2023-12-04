@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.CollectionTable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -29,6 +28,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 @Entity
+
 public abstract class Pessoa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -36,11 +36,9 @@ public abstract class Pessoa implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Integer id;
 	protected String nome;
-	@Column(unique = true)
-	@CPF
+	@CPF(message = "CPF inválido")
 	protected String cpf;
-	@Column(unique = true)
-	@Email
+	@Email(message = "email inválido")
 	protected String email;
 	protected String senha;
 
