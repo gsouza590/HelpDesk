@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.gabriel.helpdesk.exceptions.DataIntegrityViolationException;
@@ -23,6 +24,8 @@ public class TecnicoService {
 	private TecnicoRepository repository;
 	@Autowired
 	private PessoaRepository pessoaRepository;
+	@Autowired
+	private BCryptPasswordEncoder encoder;
 
 	public Tecnico findById(Integer id) {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundExceptions("Técnico Não Encontrado"));
@@ -34,6 +37,7 @@ public class TecnicoService {
 
 	public Tecnico create(TecnicoDto dto) {
 		dto.setId(null);
+		dto.setSenha(encoder.encode(dto.getSenha()));
 		validaCpfeEmail(dto);
 		Tecnico newDto = new Tecnico(dto);
 		return repository.save(newDto);
