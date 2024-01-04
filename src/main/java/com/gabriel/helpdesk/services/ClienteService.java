@@ -58,6 +58,9 @@ public class ClienteService {
 	public Cliente update(Integer id, @Valid ClienteDto dto) {
 		dto.setId(id);
 		Cliente cli = findById(id);
+		if (!dto.getSenha().equals(cli.getSenha())) {
+			dto.setSenha(encoder.encode(dto.getSenha()));
+		}
 		validaCpfeEmail(dto);
 		cli = new Cliente(dto);
 		return repository.save(cli);
