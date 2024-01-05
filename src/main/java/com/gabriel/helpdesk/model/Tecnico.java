@@ -2,6 +2,7 @@ package com.gabriel.helpdesk.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
@@ -44,7 +45,10 @@ public class Tecnico extends Pessoa {
 		this.cpf = tec.getCpf();
 		this.email = tec.getEmail();
 		this.senha = tec.getSenha();
-		this.perfis = tec.getPerfis().stream().map(x -> x.getCodigo()).collect(Collectors.toSet());
+		this.perfis = tec.getPerfis().stream()
+			    .filter(Objects::nonNull)
+			    .map(x -> x.getCodigo())
+			    .collect(Collectors.toSet());
 		this.dataCriacao = tec.getDataCriacao();
 	}
 
