@@ -2,6 +2,7 @@ package com.gabriel.helpdesk.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
@@ -20,17 +21,18 @@ import lombok.Setter;
 @Entity
 public class Cliente extends Pessoa {
 
-
 	private static final long serialVersionUID = 1L;
 
 	public Cliente() {
 		super();
 		addPerfil(Perfil.CLIENTE);
 	}
+
 	public Cliente(Integer id, String nome, String cpf, String email, String senha) {
 		super(id, nome, cpf, email, senha);
 		addPerfil(Perfil.CLIENTE);
 	}
+
 	public Cliente(ClienteDto cli) {
 		super();
 		this.id = cli.getId();
@@ -38,7 +40,8 @@ public class Cliente extends Pessoa {
 		this.cpf = cli.getCpf();
 		this.email = cli.getEmail();
 		this.senha = cli.getSenha();
-		this.perfis = cli.getPerfis().stream().map(x -> x.getCodigo()).collect(Collectors.toSet());
+		this.perfis = cli.getPerfis().stream().filter(Objects::nonNull).map(x -> x.getCodigo())
+				.collect(Collectors.toSet());
 		this.dataCriacao = cli.getDataCriacao();
 	}
 
