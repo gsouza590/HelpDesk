@@ -3,7 +3,7 @@ package com.gabriel.helpdesk.model.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gabriel.helpdesk.model.Chamado;

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 
 import com.gabriel.helpdesk.model.dto.ClienteDto;
 import com.gabriel.helpdesk.model.enums.Perfil;

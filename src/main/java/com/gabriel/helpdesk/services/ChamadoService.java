@@ -4,12 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.Valid;
-
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gabriel.helpdesk.exceptions.ObjectNotFoundExceptions;
 import com.gabriel.helpdesk.model.Chamado;
 import com.gabriel.helpdesk.model.Cliente;
 import com.gabriel.helpdesk.model.Tecnico;
@@ -17,6 +15,8 @@ import com.gabriel.helpdesk.model.dto.ChamadoDto;
 import com.gabriel.helpdesk.model.enums.Prioridade;
 import com.gabriel.helpdesk.model.enums.Status;
 import com.gabriel.helpdesk.repository.ChamadoRepository;
+
+import jakarta.validation.Valid;
 
 @Service
 public class ChamadoService {
@@ -30,7 +30,7 @@ public class ChamadoService {
 
 	public Chamado findById(Integer id) {
 		Optional<Chamado> chamado = repository.findById(id);
-		return chamado.orElseThrow(() -> new ObjectNotFoundException("Chamado não encontrado!))", null));
+		return chamado.orElseThrow(() ->new ObjectNotFoundExceptions("Chamado Não Encontrado"));
 	}
 
 	public List<Chamado> findAll() {
