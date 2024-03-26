@@ -34,6 +34,7 @@ public class SecurityConfig {
 
 	private final JWTUtil jwtUtil;
 	private final UserDetailsService userDetailsService;
+	
 
 	@Autowired
 	public SecurityConfig(JWTUtil jwtUtil, UserDetailsService userDetailsService) {
@@ -50,7 +51,7 @@ public class SecurityConfig {
 		http.cors(
 				httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 				.csrf(AbstractHttpConfigurer::disable)
-				.authorizeHttpRequests(authz -> authz.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll())
+				.authorizeHttpRequests(authz -> authz.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll().anyRequest().authenticated())
 				.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil))
 				.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, userDetailsService))
 				.authenticationManager(authenticationManager)
