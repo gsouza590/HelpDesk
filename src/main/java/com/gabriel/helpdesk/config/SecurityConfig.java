@@ -1,6 +1,6 @@
 package com.gabriel.helpdesk.config;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-		corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+		//corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost"));
 		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
