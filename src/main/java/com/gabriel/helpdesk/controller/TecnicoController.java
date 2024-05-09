@@ -48,9 +48,8 @@ public class TecnicoController {
 	@PostMapping
 	public ResponseEntity<TecnicoDto> create(@Valid @RequestBody TecnicoDto dto) {
 		Tecnico newDto = tecService.create(dto);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(newDto.getId()).toUri();
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDto.getId()).toUri();
 		return ResponseEntity.created(uri).build();
-
 	}
 
 	@PreAuthorize("hasAnyRole('ADMIN')")
@@ -63,7 +62,7 @@ public class TecnicoController {
 
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<TecnicoDto> delete(@PathVariable Integer id) {
+	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		tecService.delete(id);
 		return ResponseEntity.noContent().build();
 	}

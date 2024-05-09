@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gabriel.helpdesk.model.Cliente;
+import com.gabriel.helpdesk.model.dto.interfaces.IClienteDto;
+import com.gabriel.helpdesk.model.dto.interfaces.IPessoaDto;
 import com.gabriel.helpdesk.model.enums.Perfil;
 
 import lombok.Getter;
@@ -17,7 +19,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ClienteDto implements Serializable {
+public class ClienteDto implements Serializable, IClienteDto,IPessoaDto  {
 
 	private static final long serialVersionUID = 1L;
 

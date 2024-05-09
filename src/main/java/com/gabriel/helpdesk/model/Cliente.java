@@ -10,6 +10,7 @@ import jakarta.persistence.OneToMany;
 
 import com.gabriel.helpdesk.model.dto.ClienteDto;
 import com.gabriel.helpdesk.model.enums.Perfil;
+import com.gabriel.helpdesk.model.interfaces.ICliente;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Entity
-public class Cliente extends Pessoa {
+public class Cliente extends Pessoa implements ICliente {
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,4 +48,16 @@ public class Cliente extends Pessoa {
 
 	@OneToMany(mappedBy = "cliente")
 	private List<Chamado> chamados = new ArrayList<>();
-}
+
+	@Override
+    public void addChamado(Chamado chamado) {
+        if (chamado != null && !chamados.contains(chamado)) {
+            chamados.add(chamado);
+            chamado.setCliente(this); 
+        }
+    }
+
+
+		
+	}
+

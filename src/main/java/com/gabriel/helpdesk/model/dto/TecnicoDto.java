@@ -6,18 +6,19 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gabriel.helpdesk.model.Tecnico;
+import com.gabriel.helpdesk.model.dto.interfaces.IPessoaDto;
+import com.gabriel.helpdesk.model.dto.interfaces.ITecnicoDto;
 import com.gabriel.helpdesk.model.enums.Perfil;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class TecnicoDto implements Serializable {
+public class TecnicoDto implements Serializable,ITecnicoDto,IPessoaDto  {
 
 	private static final long serialVersionUID = 1L;
 

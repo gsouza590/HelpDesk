@@ -1,9 +1,6 @@
 package com.gabriel.helpdesk.services;
 
 import java.util.List;
-import java.util.Optional;
-
-import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,10 +9,11 @@ import org.springframework.stereotype.Service;
 import com.gabriel.helpdesk.exceptions.DataIntegrityViolationException;
 import com.gabriel.helpdesk.exceptions.ObjectNotFoundExceptions;
 import com.gabriel.helpdesk.model.Cliente;
-import com.gabriel.helpdesk.model.Pessoa;
 import com.gabriel.helpdesk.model.dto.ClienteDto;
 import com.gabriel.helpdesk.repository.ClienteRepository;
-import com.gabriel.helpdesk.repository.PessoaRepository;
+import com.gabriel.helpdesk.services.utils.Validators;
+
+import jakarta.validation.Valid;
 
 @Service
 public class ClienteService {
@@ -23,7 +21,7 @@ public class ClienteService {
 	@Autowired
 	private ClienteRepository repository;
 	@Autowired
-	private PessoaRepository pessoaRepository;
+	private Validators validator;
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 
@@ -38,21 +36,9 @@ public class ClienteService {
 	public Cliente create(ClienteDto dto) {
 		dto.setId(null);
 		dto.setSenha(encoder.encode(dto.getSenha()));
-		validaCpfeEmail(dto);
+		validator.validaCpfEEmail(dto);
 		Cliente newDto = new Cliente(dto);
 		return repository.save(newDto);
-	}
-
-	private void validaCpfeEmail(ClienteDto dto) {
-		Optional<Pessoa> obj = pessoaRepository.findByCpf(dto.getCpf());
-		if (obj.isPresent() && obj.get().getId() != dto.getId()) {
-			throw new DataIntegrityViolationException("CPF já cadastrado no sistema!");
-		}
-
-		obj = pessoaRepository.findByEmail(dto.getEmail());
-		if (obj.isPresent() && obj.get().getId() != dto.getId()) {
-			throw new DataIntegrityViolationException("E-mail já cadastrado no sistema!");
-		}
 	}
 
 	public Cliente update(Integer id, @Valid ClienteDto dto) {
@@ -61,7 +47,7 @@ public class ClienteService {
 		if (!dto.getSenha().equals(cli.getSenha())) {
 			dto.setSenha(encoder.encode(dto.getSenha()));
 		}
-		validaCpfeEmail(dto);
+		validator.validaCpfEEmail(dto);
 		cli = new Cliente(dto);
 		return repository.save(cli);
 	}
