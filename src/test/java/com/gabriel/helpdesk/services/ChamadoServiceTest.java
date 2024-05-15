@@ -88,7 +88,7 @@ class ChamadoServiceTest {
 		Mockito.when(clienteService.findById(cliente.getId())).thenReturn(cliente);
 		Mockito.when(chamadoRepository.save(Mockito.any(Chamado.class))).thenAnswer(invocation -> {
 			Chamado savedChamado = invocation.getArgument(0);
-			savedChamado.setId(1); // Assigning an ID for the saved chamado
+			savedChamado.setId(1);
 			return savedChamado;
 		});
 

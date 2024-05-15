@@ -10,6 +10,7 @@ import com.gabriel.helpdesk.model.dto.TecnicoDto;
 import com.gabriel.helpdesk.model.enums.Perfil;
 import com.gabriel.helpdesk.model.interfaces.ITecnico;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-
+@DiscriminatorValue("TECNICO")
 @Entity
 public class Tecnico extends Pessoa implements ITecnico {
 

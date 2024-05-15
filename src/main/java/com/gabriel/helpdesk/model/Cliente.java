@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Entity
+@DiscriminatorValue("CLIENTE")
 public class Cliente extends Pessoa implements ICliente {
 
 	private static final long serialVersionUID = 1L;
