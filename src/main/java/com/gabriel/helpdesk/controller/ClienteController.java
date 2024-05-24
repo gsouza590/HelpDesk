@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import com.gabriel.helpdesk.model.Cliente;
 import com.gabriel.helpdesk.model.dto.ClienteDto;
 import com.gabriel.helpdesk.services.ClienteService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -29,6 +31,8 @@ public class ClienteController {
 	@Autowired
 	private ClienteService cliService;
 
+	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<ClienteDto> findById(@PathVariable Integer id) {
 
@@ -36,6 +40,8 @@ public class ClienteController {
 		return ResponseEntity.ok(new ClienteDto(cli));
 	}
 
+	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<ClienteDto>> findAll() {
 		List<Cliente> list = cliService.findAll();
@@ -43,6 +49,8 @@ public class ClienteController {
 		return ResponseEntity.ok().body(listDto);
 	}
 
+	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
 	public ResponseEntity<ClienteDto> create(@Valid @RequestBody ClienteDto dto) {
 		Cliente newDto = cliService.create(dto);
@@ -51,12 +59,15 @@ public class ClienteController {
 
 	}
 
+	@Transactional
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<ClienteDto> update(@PathVariable Integer id, @Valid @RequestBody ClienteDto dto) {
-		Cliente tec = cliService.update(id, dto);
-		return ResponseEntity.ok().body(new ClienteDto(tec));
+		Cliente cli = cliService.update(id, dto);
+		return ResponseEntity.ok().body(new ClienteDto(cli));
 	}
 
+	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<ClienteDto> delete(@PathVariable Integer id) {
 		cliService.delete(id);

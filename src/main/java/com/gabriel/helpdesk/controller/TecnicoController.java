@@ -21,6 +21,7 @@ import com.gabriel.helpdesk.model.Tecnico;
 import com.gabriel.helpdesk.model.dto.TecnicoDto;
 import com.gabriel.helpdesk.services.TecnicoService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -30,6 +31,7 @@ public class TecnicoController {
 	@Autowired
 	private TecnicoService tecService;
 
+	@Transactional
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<TecnicoDto> findById(@PathVariable Integer id) {
 
@@ -37,6 +39,7 @@ public class TecnicoController {
 		return ResponseEntity.ok(new TecnicoDto(tec));
 	}
 
+	@Transactional
 	@GetMapping
 	public ResponseEntity<List<TecnicoDto>> findAll() {
 		List<Tecnico> list = tecService.findAll();
@@ -44,6 +47,7 @@ public class TecnicoController {
 		return ResponseEntity.ok().body(listDto);
 	}
 
+	@Transactional
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@PostMapping
 	public ResponseEntity<TecnicoDto> create(@Valid @RequestBody TecnicoDto dto) {
@@ -53,13 +57,14 @@ public class TecnicoController {
 	}
 
 	@PreAuthorize("hasAnyRole('ADMIN')")
-
+	@Transactional
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<TecnicoDto> update(@PathVariable Integer id, @Valid @RequestBody TecnicoDto dto) {
 		Tecnico tec = tecService.update(id, dto);
 		return ResponseEntity.ok().body(new TecnicoDto(tec));
 	}
 
+	@Transactional
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
