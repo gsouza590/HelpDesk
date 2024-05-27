@@ -1,6 +1,7 @@
 package com.gabriel.helpdesk.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Service;
 import com.gabriel.helpdesk.exceptions.ObjectNotFoundExceptions;
 import com.gabriel.helpdesk.model.Chamado;
 import com.gabriel.helpdesk.model.Cliente;
+import com.gabriel.helpdesk.model.Pessoa;
 import com.gabriel.helpdesk.model.Tecnico;
 import com.gabriel.helpdesk.model.dto.ChamadoDto;
 import com.gabriel.helpdesk.model.enums.Prioridade;
 import com.gabriel.helpdesk.model.enums.Status;
 import com.gabriel.helpdesk.repository.ChamadoRepository;
+import com.gabriel.helpdesk.repository.PessoaRepository;
 
 import jakarta.validation.Valid;
 
@@ -23,6 +26,8 @@ public class ChamadoService {
 
 	@Autowired
 	private ChamadoRepository repository;
+	@Autowired
+	private PessoaRepository pessoaRepository;
 	@Autowired
 	private TecnicoService tecnicoService;
 	@Autowired
@@ -68,5 +73,18 @@ public class ChamadoService {
 		Chamado old = findById(id);
 		old = newChamado(dto);
 		return repository.save(old);
+	}
+
+	public List<Chamado> findByLoggedUser(String email) {
+	    Pessoa pessoa = pessoaRepository.findByEmail(email)
+                .orElseThrow(() -> new ObjectNotFoundExceptions("Pessoa não encontrada"));
+        
+        if (pessoa instanceof Tecnico) {
+            return repository.findByTecnicoId(pessoa.getId());
+        } else if (pessoa instanceof Cliente) {
+            return repository.findByClienteId(pessoa.getId());
+        } else {
+            return new ArrayList<>();
+        }
 	}
 }
