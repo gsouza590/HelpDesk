@@ -22,6 +22,7 @@ import com.gabriel.helpdesk.model.dto.ChamadoDto;
 import com.gabriel.helpdesk.model.enums.Prioridade;
 import com.gabriel.helpdesk.model.enums.Status;
 import com.gabriel.helpdesk.repository.ChamadoRepository;
+import com.gabriel.helpdesk.repository.ClienteRepository;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +30,8 @@ class ChamadoServiceTest {
 
 	@InjectMocks
 	private ChamadoService service;
-
+	@Mock
+	private ClienteRepository clienteRepository;
 	@Mock
 	private ChamadoRepository chamadoRepository;
 	@Mock

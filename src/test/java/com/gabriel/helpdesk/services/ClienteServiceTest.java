@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.gabriel.helpdesk.exceptions.DataIntegrityViolationException;
+import com.gabriel.helpdesk.model.Chamado;
+import com.gabriel.helpdesk.services.utils.Validators;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +39,10 @@ class ClienteServiceTest {
 
 	@Mock
 	private BCryptPasswordEncoder encoder;
-
+	@Mock
 	private Cliente cliente;
+	@Mock
+	private Validators validators;
 
 	@BeforeEach
 	void setUp() {
@@ -50,6 +55,17 @@ class ClienteServiceTest {
 		Mockito.when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente));
 
 		Cliente foundCliente = service.findById(id);
+
+		Assertions.assertNotNull(foundCliente);
+		Assertions.assertEquals(cliente.getId(), foundCliente.getId());
+	}
+
+	@Test
+	void findByEmail() {
+		String email = cliente.getEmail();
+		Mockito.when(clienteRepository.findByEmail(email)).thenReturn(Optional.of(cliente).get());
+
+		Cliente foundCliente = service.findByEmail(email);
 
 		Assertions.assertNotNull(foundCliente);
 		Assertions.assertEquals(cliente.getId(), foundCliente.getId());
@@ -76,9 +92,8 @@ class ClienteServiceTest {
 		dto.setEmail(cliente.getEmail());
 		dto.setSenha(cliente.getSenha());
 
+		Mockito.doNothing().when(validators).validaCpfEEmail(dto);
 		Mockito.when(encoder.encode(cliente.getSenha())).thenReturn("hashedPassword");
-		Mockito.when(pessoaRepository.findByCpf(cliente.getCpf())).thenReturn(Optional.empty());
-		Mockito.when(pessoaRepository.findByEmail(cliente.getEmail())).thenReturn(Optional.empty());
 		Mockito.when(clienteRepository.save(Mockito.any(Cliente.class))).thenAnswer(invocation -> {
 			Cliente savedCliente = invocation.getArgument(0);
 			savedCliente.setId(1); // Assigning an ID for the saved cliente
@@ -103,8 +118,6 @@ class ClienteServiceTest {
 
 		Mockito.when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente));
 		Mockito.when(encoder.encode(dto.getSenha())).thenReturn("hashedPassword");
-		Mockito.when(pessoaRepository.findByCpf(cliente.getCpf())).thenReturn(Optional.empty());
-		Mockito.when(pessoaRepository.findByEmail(cliente.getEmail())).thenReturn(Optional.empty());
 		Mockito.when(clienteRepository.save(Mockito.any(Cliente.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -122,4 +135,24 @@ class ClienteServiceTest {
 
 		Assertions.assertDoesNotThrow(() -> service.delete(id));
 	}
+
+	@Test
+	void testDeleteWithOrdersShouldThrowException() {
+		Integer id = 1;
+		Cliente cliente = new Cliente();
+		cliente.setId(id);
+		List<Chamado> chamados = new ArrayList<>();
+		chamados.add(new Chamado());
+		cliente.setChamados(chamados);
+
+		Mockito.when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente));
+
+		Exception exception = Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+			service.delete(id);
+		});
+
+		Assertions.assertEquals("Cliente possui ordens de serviço e não pode ser deletado", exception.getMessage());
+		Mockito.verify(clienteRepository, Mockito.never()).deleteById(id);
+	}
+
 }

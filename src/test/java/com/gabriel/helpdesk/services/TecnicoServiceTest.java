@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.gabriel.helpdesk.services.utils.Validators;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,8 @@ class TecnicoServiceTest {
 
 	@Mock
 	private BCryptPasswordEncoder encoder;
+	@Mock
+	private Validators validators;
 
 	private Tecnico tecnico;
 
@@ -77,10 +80,8 @@ class TecnicoServiceTest {
 		dto.setCpf(tecnico.getCpf());
 		dto.setEmail(tecnico.getEmail());
 		dto.setSenha(tecnico.getSenha());
-
+		Mockito.doNothing().when(validators).validaCpfEEmail(dto);
 		Mockito.when(encoder.encode(tecnico.getSenha())).thenReturn("hashedPassword");
-		Mockito.when(pessoaRepository.findByCpf(tecnico.getCpf())).thenReturn(Optional.empty());
-		Mockito.when(pessoaRepository.findByEmail(tecnico.getEmail())).thenReturn(Optional.empty());
 		Mockito.when(tecnicoRepository.save(Mockito.any(Tecnico.class))).thenAnswer(invocation -> {
 			Tecnico savedTecnico = invocation.getArgument(0);
 			savedTecnico.setId(1); // Assigning an ID for the saved tecnico
@@ -103,15 +104,13 @@ class TecnicoServiceTest {
 		dto.setEmail(tecnico.getEmail());
 		dto.setSenha("newPassword");
 
+		Mockito.doNothing().when(validators).validaCpfEEmail(dto);
 		Mockito.when(tecnicoRepository.findById(id)).thenReturn(Optional.of(tecnico));
 		Mockito.when(encoder.encode(dto.getSenha())).thenReturn("hashedPassword");
-		Mockito.when(pessoaRepository.findByCpf(tecnico.getCpf())).thenReturn(Optional.empty());
-		Mockito.when(pessoaRepository.findByEmail(tecnico.getEmail())).thenReturn(Optional.empty());
 		Mockito.when(tecnicoRepository.save(Mockito.any(Tecnico.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 
 		Tecnico updatedTecnico = service.update(id, dto);
-
 		Assertions.assertNotNull(updatedTecnico);
 		Assertions.assertEquals(dto.getNome(), updatedTecnico.getNome());
 	}
