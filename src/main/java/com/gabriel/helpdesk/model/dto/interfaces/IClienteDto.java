@@ -15,5 +15,5 @@ public interface IClienteDto {
 
 	String getSenha();
 
-	Set<Perfil> getPerfis();
+	Set<Perfil> getPerfis();  // Ajuste aqui para Set<Integer>
 }

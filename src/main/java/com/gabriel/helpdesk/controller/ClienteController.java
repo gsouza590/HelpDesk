@@ -54,7 +54,7 @@ public class ClienteController {
 	@PostMapping
 	public ResponseEntity<ClienteDto> create(@Valid @RequestBody ClienteDto dto) {
 		Cliente newDto = cliService.create(dto);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("{/id}").buildAndExpand(newDto.getId()).toUri();
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDto.getId()).toUri();
 		return ResponseEntity.created(uri).build();
 
 	}

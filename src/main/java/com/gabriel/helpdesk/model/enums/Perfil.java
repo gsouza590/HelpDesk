@@ -1,5 +1,6 @@
 package com.gabriel.helpdesk.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ public enum Perfil {
 
 	private Integer codigo;
 	private String descricao;
+
 
 	public static Perfil toEnum(Integer cod) {
 		if (cod == null) {
