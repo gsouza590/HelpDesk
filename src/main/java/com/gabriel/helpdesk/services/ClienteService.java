@@ -1,6 +1,7 @@
 package com.gabriel.helpdesk.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,9 +30,10 @@ public class ClienteService {
 		return repository.findById(id).orElseThrow(() -> new ObjectNotFoundExceptions("Cliente Não Encontrado"));
 	}
 
-	public Cliente findByEmail(String email) {
-		return repository.findByEmail(email);
-	}
+    public Cliente findByEmail(String email) {
+        return Optional.ofNullable(repository.findByEmail(email))
+                .orElseThrow(() -> new ObjectNotFoundExceptions("Cliente Não Encontrado"));
+    }
 
 	public List<Cliente> findAll() {
 		return repository.findAll();
