@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import com.gabriel.helpdesk.exceptions.ObjectNotFoundExceptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -103,7 +104,12 @@ class ChamadoControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(chamado.getId())))
                 .andExpect(jsonPath("$[0].titulo", is(chamado.getTitulo())))
-                .andExpect(jsonPath("$[0].observacoes", is(chamado.getObservacoes())));
+                .andExpect(jsonPath("$[0].observacoes", is(chamado.getObservacoes())))
+                .andExpect(jsonPath("$[0].tecnico", is(tecnico.getId())))
+                .andExpect(jsonPath("$[0].cliente", is(cliente.getId())))
+                .andExpect(jsonPath("$[0].nomeTecnico", is(tecnico.getNome())))
+                .andExpect(jsonPath("$[0].nomeCliente", is(cliente.getNome())))
+        ;
     }
 
     @Test
@@ -121,9 +127,30 @@ class ChamadoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(chamado.getId())))
                 .andExpect(jsonPath("$.titulo", is(chamado.getTitulo())))
-                .andExpect(jsonPath("$.observacoes", is(chamado.getObservacoes())));
+                .andExpect(jsonPath("$.observacoes", is(chamado.getObservacoes())))
+                .andExpect(jsonPath("$.tecnico", is(tecnico.getId())))
+                .andExpect(jsonPath("$.cliente", is(cliente.getId())))
+                .andExpect(jsonPath("$.nomeTecnico", is(tecnico.getNome())))
+                .andExpect(jsonPath("$.nomeCliente", is(cliente.getNome())));
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("FindById Chamado Not Found")
+    void testFindByIdChamadoNotFound() throws Exception {
+        Integer chamadoId = 3;
+
+        when(service.findById(chamadoId)).thenThrow(new ObjectNotFoundExceptions("Chamado não Encontrado"));
+
+        mockMvc.perform(get("/chamados/" + chamadoId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error", is("Object Not Found")))
+                .andExpect(jsonPath("$.message", is("Chamado não Encontrado")))
+                .andExpect(jsonPath("$.path", is("/chamados/" + chamadoId)));
+    }
     @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("Create Chamado With Success")

@@ -2,6 +2,8 @@ package com.gabriel.helpdesk.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.gabriel.helpdesk.exceptions.ObjectNotFoundExceptions;
+import com.gabriel.helpdesk.exceptions.DataIntegrityViolationException;
 import com.gabriel.helpdesk.model.Cliente;
 import com.gabriel.helpdesk.model.dto.ClienteDto;
 import com.gabriel.helpdesk.model.enums.Perfil;
@@ -19,15 +21,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,6 +75,13 @@ class ClienteControllerTest {
     }
 
     @Test
+    @DisplayName("Access Endpoint Without Authentication")
+    void testAccessWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/clientes/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("FindAll Cliente With Success")
     void testFindAllClienteWithSuccess() throws Exception {
@@ -123,6 +128,64 @@ class ClienteControllerTest {
                     assert location.contains("/clientes/1") ;
                 });
 }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Create Cliente With Email BadRequest")
+    void testCreateClienteWithEmailBadRequest() throws Exception {
+
+        String clienteJson = "{ \"nome\": \"TesteCliente\", \"cpf\": \"16124957027\", \"email\": \"teste2gmail.com\", \"senha\": \"123\", \"perfis\": [1] }";
+
+        mockMvc.perform(post("/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(clienteJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Validation Error"))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.path").value("/clientes"))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0].fieldName", is("email")))
+                .andExpect(jsonPath("$.errors[0].message", is("Email inválido")));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Create Cliente With CPF BadRequest")
+    void testCreateClienteWithCPFBadRequest() throws Exception {
+        // JSON de entrada com e-mail inválido
+        String clienteJson = "{ \"nome\": \"TesteCliente\", \"cpf\": \"111\", \"email\": \"teste2@gmail.com\", \"senha\": \"123\", \"perfis\": [1] }";
+
+        mockMvc.perform(post("/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(clienteJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Validation Error"))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.path").value("/clientes"))
+                .andExpect(jsonPath("$.errors", hasSize(1))) // Ajuste o tamanho de acordo com a quantidade de erros esperados
+                .andExpect(jsonPath("$.errors[0].fieldName", is("cpf"))) // Campo específico com erro
+                .andExpect(jsonPath("$.errors[0].message", is("CPF inválido"))); // Mensagem de erro esperada
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Create Cliente With Duplicate Data")
+    void testCreateClienteWithDuplicateData() throws Exception {
+        String clienteJson = "{ \"nome\": \"TesteCliente\", \"cpf\": \"81182698093\", \"email\": \"teste2@gmail.com\", \"senha\": \"123456\", \"perfis\": [1] }";
+
+        doThrow(new DataIntegrityViolationException("Email já cadastrado")).when(clienteService).create(any(ClienteDto.class));
+
+        mockMvc.perform(post("/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(clienteJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("Violação de Dados")))
+                .andExpect(jsonPath("$.message", is("Email já cadastrado")));
+    }
+
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -151,6 +214,24 @@ class ClienteControllerTest {
                 .andExpect(jsonPath("$.senha", is(cliente.getSenha())))
                 .andExpect(jsonPath("$.perfis", hasItems("CLIENTE")));
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("FindById Cliente Not Found")
+    void testFindByIdClienteNotFound() throws Exception {
+        when(clienteService.findById(any(Integer.class))).thenThrow(new ObjectNotFoundExceptions("Cliente não encontrado"));
+
+
+        mockMvc.perform(get("/clientes/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.timestamp").exists()) // Verifica se o timestamp existe
+                .andExpect(jsonPath("$.status").value(404)) // Verifica se o status é 404
+                .andExpect(jsonPath("$.error", is("Object Not Found"))) // Verifica se o error é "Object Not Found"
+                .andExpect(jsonPath("$.message", is("Cliente não encontrado"))) // Verifica se a mensagem é "Cliente não encontrado"
+                .andExpect(jsonPath("$.path", is("/clientes/1")));
+    }
+
     @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("Delete Cliente With Success")
@@ -161,5 +242,19 @@ class ClienteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Delete Cliente Not Found")
+    void testDeleteClienteNotFound() throws Exception {
+        doThrow(new ObjectNotFoundExceptions("Cliente não encontrado")).when(clienteService).delete(any(Integer.class));
+
+        mockMvc.perform(delete("/clientes/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error", is("Object Not Found")))
+                .andExpect(jsonPath("$.message", is("Cliente não encontrado")));
+    }
+
 }
 

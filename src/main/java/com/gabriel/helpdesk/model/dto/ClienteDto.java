@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.gabriel.helpdesk.model.dto.interfaces.IClienteDto;
 import com.gabriel.helpdesk.model.dto.interfaces.IPessoaDto;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -15,6 +16,7 @@ import com.gabriel.helpdesk.model.Cliente;
 import com.gabriel.helpdesk.model.enums.Perfil;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CPF;
 
 @Getter
 @Setter
@@ -25,9 +27,11 @@ public class ClienteDto implements Serializable , IClienteDto, IPessoaDto {
 	protected Integer id;
 	@NotNull(message = "O campo deve ser preenchido ")
 	protected String nome;
+	@CPF(message = "CPF inválido")
 	@NotNull(message = "O campo deve ser preenchido ")
 	protected String cpf;
 	@NotNull(message = "O campo deve ser preenchido ")
+	@Email(message = "Email inválido")
 	protected String email;
 	@NotNull(message = "O campo deve ser preenchido ")
 	protected String senha;
