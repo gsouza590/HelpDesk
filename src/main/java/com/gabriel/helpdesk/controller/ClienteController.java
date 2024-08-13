@@ -41,7 +41,6 @@ public class ClienteController {
 	}
 
 	@Transactional
-	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<ClienteDto>> findAll() {
 		List<Cliente> list = cliService.findAll();

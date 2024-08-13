@@ -1,5 +1,5 @@
 CREATE TABLE pessoa (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     data_criacao DATE,
     dtype VARCHAR(255),
     cpf VARCHAR(255),
