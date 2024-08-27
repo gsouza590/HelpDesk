@@ -27,7 +27,6 @@ jobs:
         cache: maven
     
     - name: Build Application JAR
-      working-directory: ./HelpDesk
       run: mvn clean package
 
     - name: Build Docker Image
