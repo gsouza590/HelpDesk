@@ -71,8 +71,9 @@ public class ChamadoService {
 
 		dto.setId(id);
 		Chamado old = findById(id);
-		old = newChamado(dto);
-		return repository.save(old);
+		Chamado upChamado= newChamado(dto);
+		upChamado.setDataAbertura(old.getDataAbertura());
+		return repository.save(upChamado);
 	}
 
 	public List<Chamado> findByLoggedUser(String email) {
