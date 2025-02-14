@@ -1,9 +1,12 @@
 package com.gabriel.helpdesk.services;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,5 +90,37 @@ public class ChamadoService {
         } else {
             return new ArrayList<>();
         }
+	}
+	public Map<String, Long> getChamadosPorStatus() {
+		List<Chamado> chamados = repository.findAll();
+		return chamados.stream()
+				.collect(Collectors.groupingBy(c -> c.getStatus().name(), Collectors.counting()));
+	}
+
+
+	public Map<String, Long> getChamadosPorPrioridade() {
+		List<Chamado> chamados = repository.findAll();
+		return chamados.stream()
+				.collect(Collectors.groupingBy(c -> c.getPrioridade().name(), Collectors.counting()));
+	}
+
+	public Map<String, Long> getChamadosPorMes() {
+		List<Chamado> chamados = repository.findAll();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+		return chamados.stream()
+				.collect(Collectors.groupingBy(c -> c.getDataAbertura().format(formatter), Collectors.counting()));
+	}
+
+
+	public Map<String, Long> getChamadosPorTecnico() {
+		List<Chamado> chamados = repository.findAll();
+		return chamados.stream()
+				.collect(Collectors.groupingBy(c -> c.getTecnico().getNome(), Collectors.counting()));
+	}
+
+	public Map<String, Long> getChamadosPorCliente() {
+		List<Chamado> chamados = repository.findAll();
+		return chamados.stream()
+				.collect(Collectors.groupingBy(c -> c.getCliente().getNome(), Collectors.counting()));
 	}
 }
