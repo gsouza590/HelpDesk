@@ -20,6 +20,7 @@ public class RelatorioController {
     }
 
     @GetMapping("/chamado/{id}")
+
     public ResponseEntity<byte[]> gerarRelatorio(@PathVariable Integer id) {
         byte[] pdfBytes = relatorioService.gerarRelatorioChamado(id);
 
