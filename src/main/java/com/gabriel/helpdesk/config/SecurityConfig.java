@@ -50,7 +50,7 @@ public class SecurityConfig {
 		http.cors(
 				httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 				.csrf(AbstractHttpConfigurer::disable)
-				.authorizeHttpRequests(authz -> authz.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll().anyRequest().authenticated())
+				.authorizeHttpRequests(authz -> authz.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll().requestMatchers("/api/relatorio/chamado/**").authenticated().anyRequest().authenticated())
 				.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil))
 				.addFilter(new JWTAuthorizationFilter(authenticationManager, jwtUtil, userDetailsService))
 				.authenticationManager(authenticationManager)
@@ -67,7 +67,6 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-		//corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost"));
 		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
